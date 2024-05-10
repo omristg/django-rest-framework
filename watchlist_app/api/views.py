@@ -2,9 +2,33 @@ from rest_framework.decorators import api_view
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework import generics
 
-from watchlist_app.models import WatchList, StreamPlatform
-from watchlist_app.api.serializers import WatchListSerializer, StreamPlatformSerializer
+from watchlist_app.models import WatchList, StreamPlatform, Review
+from watchlist_app.api.serializers import WatchListSerializer, StreamPlatformSerializer, ReviewSerializer
+
+
+class ReviewList(generics.ListAPIView):
+    def get_queryset(self):
+        watchlist_pk = self.kwargs.get('pk')
+        return Review.objects.filter(watchlist=watchlist_pk)
+
+    serializer_class = ReviewSerializer
+
+
+class ReviewCreate(generics.CreateAPIView):
+
+    def perform_create(self, serializer):
+        watchlist_pk = self.kwargs.get('pk')
+        watchlist = WatchList.objects.get(pk=watchlist_pk)
+        serializer.save(watchlist=watchlist)
+
+    serializer_class = ReviewSerializer
+
+
+class ReviewDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Review.objects.all()
+    serializer_class = ReviewSerializer
 
 
 class StreamPlatformAV(APIView):
