@@ -1,8 +1,7 @@
 from rest_framework.decorators import api_view
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status
-from rest_framework import generics
+from rest_framework import status, generics, viewsets
 
 from watchlist_app.models import WatchList, StreamPlatform, Review
 from watchlist_app.api.serializers import WatchListSerializer, StreamPlatformSerializer, ReviewSerializer
@@ -29,6 +28,12 @@ class ReviewCreate(generics.CreateAPIView):
 class ReviewDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
+
+
+class StreamPlatformViewSet(viewsets.ModelViewSet):
+    queryset = StreamPlatform.objects.all()
+    serializer_class = StreamPlatformSerializer
+# Option for  ModelViewSet on same StreamPlatform
 
 
 class StreamPlatformAV(APIView):
