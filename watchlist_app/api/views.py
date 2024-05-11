@@ -2,6 +2,7 @@ from rest_framework.decorators import api_view
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, generics, viewsets
+from rest_framework.exceptions import ValidationError
 
 from watchlist_app.models import WatchList, StreamPlatform, Review
 from watchlist_app.api.serializers import WatchListSerializer, StreamPlatformSerializer, ReviewSerializer
@@ -17,10 +18,20 @@ class ReviewList(generics.ListAPIView):
 
 class ReviewCreate(generics.CreateAPIView):
 
+    def get_queryset(self):
+        return Review.objects.all()
+
     def perform_create(self, serializer):
         watchlist_pk = self.kwargs.get('pk')
         watchlist = WatchList.objects.get(pk=watchlist_pk)
-        serializer.save(watchlist=watchlist)
+
+        current_user = self.request.user
+        existing_reviews = Review.objects.filter(
+            watchlist=watchlist, review_user=current_user)
+        if existing_reviews.exists():
+            raise ValidationError('You cannot submit more reviews to this item')
+
+        serializer.save(watchlist=watchlist, review_user=current_user)
 
     serializer_class = ReviewSerializer
 
