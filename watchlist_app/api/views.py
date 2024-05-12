@@ -4,6 +4,8 @@ from rest_framework.response import Response
 from rest_framework import status, generics, viewsets
 from rest_framework.exceptions import ValidationError
 
+
+from watchlist_app.api.permissions import IsReviewOwnerOrReadOnlyOrAdmin
 from watchlist_app.models import WatchList, StreamPlatform, Review
 from watchlist_app.api.serializers import WatchListSerializer, StreamPlatformSerializer, ReviewSerializer
 
@@ -29,7 +31,8 @@ class ReviewCreate(generics.CreateAPIView):
         existing_reviews = Review.objects.filter(
             watchlist=watchlist, review_user=current_user)
         if existing_reviews.exists():
-            raise ValidationError('You cannot submit more reviews to this item')
+            raise ValidationError(
+                'You cannot submit more reviews to this item')
 
         serializer.save(watchlist=watchlist, review_user=current_user)
 
@@ -39,6 +42,7 @@ class ReviewCreate(generics.CreateAPIView):
 class ReviewDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
+    permission_classes = [IsReviewOwnerOrReadOnlyOrAdmin]
 
 
 class StreamPlatformViewSet(viewsets.ModelViewSet):
