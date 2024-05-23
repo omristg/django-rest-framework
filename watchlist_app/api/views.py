@@ -3,6 +3,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, generics, viewsets
 from rest_framework.exceptions import ValidationError
+from rest_framework import permissions
 
 
 from watchlist_app.api.permissions import IsReviewOwnerOrReadOnlyOrAdmin
@@ -97,6 +98,8 @@ class StreamPlatformDetailsAV(APIView):
 
 
 class WatchListAV(APIView):
+
+    permission_classes = (permissions.IsAuthenticated,)
 
     def get(self, request):
         watchlists = WatchList.objects.all()
