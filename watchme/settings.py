@@ -10,7 +10,6 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
-import os
 from pathlib import Path
 from decouple import config
 
@@ -28,7 +27,7 @@ SECRET_KEY = config("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["django-omristg.azurewebsites.net"]
+ALLOWED_HOSTS = ["django-omristg.azurewebsites.net", "127.0.0.1"]
 
 
 # Application definition
@@ -89,7 +88,7 @@ WSGI_APPLICATION = "watchme.wsgi.application"
 #     }
 # }
 
-conn_str = os.environ["AZURE_POSTGRESQL_CONNECTIONSTRING"]
+
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
