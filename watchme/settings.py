@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
+import os
 from pathlib import Path
 from decouple import config
 
@@ -88,6 +89,7 @@ WSGI_APPLICATION = "watchme.wsgi.application"
 #     }
 # }
 
+conn_str = os.environ["AZURE_POSTGRESQL_CONNECTIONSTRING"]
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
