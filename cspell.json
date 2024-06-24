@@ -3,6 +3,7 @@
 		"authtoken",
 		"viewsets",
 		"watchlist",
-		"watchlists"
+		"watchlists",
+		"whitenoise"
 	]
 }
