@@ -1,3 +1,8 @@
 {
-	"words": ["watchlist"]
+	"words": [
+		"authtoken",
+		"viewsets",
+		"watchlist",
+		"watchlists"
+	]
 }

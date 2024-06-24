@@ -1,43 +1,45 @@
 from rest_framework import serializers
-from watchlist_app.models import Movie
+from watchlist_app.models import Review, WatchList, StreamPlatform
 
 
-def is_capitalized(value):
-    if value[0].islower():
-        raise serializers.ValidationError('Value must be Capitalized!')
+class ReviewSerializer(serializers.ModelSerializer):
+    review_user = serializers.StringRelatedField(read_only=True)
+    watchlist = serializers.SerializerMethodField(read_only=True)
+
+    def get_watchlist(self, object):
+        return object.watchlist.title
+
+    class Meta:
+        model = Review
+        fields = '__all__'
 
 
-class MovieSerializer(serializers.Serializer):
-    id = serializers.IntegerField(read_only=True)
-    name = serializers.CharField()
-    description = serializers.CharField(validators=[is_capitalized])
-    active = serializers.BooleanField()
+class WatchListSerializer(serializers.ModelSerializer):
+    reviews = ReviewSerializer(many=True, read_only=True)
+    platform_name = serializers.SerializerMethodField()
 
-    def create(self, validated_data):
-        return Movie.objects.create(**validated_data)
+    class Meta:
+        model = WatchList
+        fields = ['id', 'title', 'storyline', 'active', 'created',
+                  'platform', 'platform_name', 'reviews']
 
-    def update(self, instance, validated_data):
-        instance.name = validated_data.get('name', instance.name)
-        instance.description = validated_data.get(
-            'description', instance.description)
-        instance.active = validated_data.get('active', instance.active)
-        instance.save()
-        return instance
+    def get_platform_name(self, object):
+        return object.platform.name
 
-    def validate_name(self, value):
-        if len(value) < 3:
-            raise serializers.ValidationError('Name is too short!')
-        if len(value) > 50:
-            raise serializers.ValidationError('Name is too long!')
-        return value
 
-    def validate_description(self, value):
-        if len(value) < 10:
-            raise serializers.ValidationError('Description is too short!')
-        return value
+class StreamPlatformSerializer(serializers.ModelSerializer):
+    watchlist = WatchListSerializer(many=True, read_only=True)
 
-    def validate(self, data):
-        if data['name'] == data['description']:
-            raise serializers.ValidationError(
-                'Name and Description should be different!')
-        return data
+    # Types of serializers relations
+    # watchlist = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+    # watchlist = serializers.StringRelatedField(many=True)
+    # watchlist = serializers.HyperlinkedRelatedField(
+    #     many=True,
+    #     read_only=True,
+    #     view_name='watchlist-details'
+    # )
+    # watchlist = serializers.HyperlinkedIdentityField(view_name='watchlist-details', many=True)
+
+    class Meta:
+        model = StreamPlatform
+        fields = '__all__'
